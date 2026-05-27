@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillArena.id — Turnamen Aktif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#FFD600;--o:#FF4D00;--g:#00E676;--p:#A259FF;--r:#FF3366;
+  --dark:#07070F;--dark2:#0F0F1A;--dark3:#171726;--dark4:#1F1F32;
+  --text:#F0F0FF;--muted:#6B6B90;--border:rgba(255,255,255,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none}
+@media(max-width:768px){body{cursor:auto}}
+
+/* CURSOR */
+.cur{width:10px;height:10px;background:var(--y);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:transform .1s}
+.cur-r{width:34px;height:34px;border:1.5px solid rgba(255,214,0,.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .12s ease}
+@media(max-width:768px){.cur,.cur-r{display:none}}
+
+/* BG */
+.mesh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(100px);opacity:.07;animation:floatBlob 12s ease-in-out infinite}
+.b1{width:500px;height:500px;background:var(--p);top:-150px;left:-150px}
+.b2{width:400px;height:400px;background:var(--o);bottom:-100px;right:-100px;animation-delay:-5s}
+@keyframes floatBlob{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+
+/* TOPBAR */
+nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;z-index:100;background:rgba(7,7,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:900;color:var(--y);text-decoration:none;letter-spacing:-.5px}
+.logo span{color:var(--text)}
+.nav-r{display:flex;align-items:center;gap:16px}
+.nav-balance{display:flex;align-items:center;gap:12px;font-size:13px}
+.bal-item{display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid var(--border);padding:6px 12px;border-radius:100px}
+.bal-icon{font-size:14px}
+.bal-val{font-weight:600;font-size:13px}
+.btn-daftar{background:var(--y);color:var(--dark);padding:8px 18px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn-daftar:hover{transform:scale(1.04);box-shadow:0 0 16px rgba(255,214,0,.4)}
+@media(max-width:600px){nav{padding:12px 16px}.nav-balance{display:none}}
+
+/* MAIN */
+.main{max-width:1080px;margin:0 auto;padding:88px 20px 40px;position:relative;z-index:1}
+
+/* HEADER */
+.page-header{margin-bottom:28px}
+.page-title{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted)}
+
+/* FILTER TABS */
+.filter-wrap{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+.filter-btn{padding:8px 16px;background:var(--dark3);border:1px solid var(--border);border-radius:100px;font-size:13px;font-weight:500;color:var(--muted);cursor:none;transition:all .15s;white-space:nowrap}
+@media(max-width:768px){.filter-btn{cursor:auto}}
+.filter-btn:hover{border-color:rgba(255,255,255,.15);color:var(--text)}
+.filter-btn.active{background:var(--y);color:var(--dark);border-color:var(--y);font-weight:700}
+
+/* SESSION LABEL */
+.session-label{display:flex;align-items:center;gap:10px;margin-bottom:16px;margin-top:8px}
+.sess-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+.sess-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+.sess-line{flex:1;height:1px;background:var(--border)}
+
+/* TOURNAMENT GRID */
+.tour-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:32px}
+@media(max-width:480px){.tour-grid{grid-template-columns:1fr}}
+
+/* TOURNAMENT CARD */
+.tour-card{background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid var(--border);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;cursor:none}
+@media(max-width:768px){.tour-card{cursor:auto}}
+.tour-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.tour-card.featured{border-color:rgba(255,214,0,.2);background:linear-gradient(135deg,rgba(255,214,0,.05),rgba(255,77,0,.03))}
+.tour-card.featured:hover{border-color:rgba(255,214,0,.4);box-shadow:0 12px 32px rgba(255,214,0,.08)}
+.tour-card.gratis{border-color:rgba(0,230,118,.15)}
+.tour-card.gratis:hover{border-color:rgba(0,230,118,.35);box-shadow:0 12px 32px rgba(0,230,118,.06)}
+
+/* CARD SHIMMER TOP */
+.tour-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--y),var(--o))}
+.tour-card.gratis::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--p))}
+
+/* CARD HEADER */
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.card-cat{display:flex;align-items:center;gap:8px}
+.cat-em2{font-size:24px}
+.cat-info{}
+.cat-name2{font-size:14px;font-weight:600;margin-bottom:2px}
+.cat-type{font-size:11px;color:var(--muted)}
+.card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.badge-live{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--r)}
+.live-dot2{width:6px;height:6px;border-radius:50%;background:var(--r);animation:pulse 1.2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.badge-feat{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,214,0,.15);color:var(--y)}
+.badge-free{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(0,230,118,.12);color:var(--g)}
+
+/* CARD STATS */
+.card-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;padding:12px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid var(--border)}
+.cs{display:flex;flex-direction:column;gap:2px}
+.cs-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.cs-val{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.cs-val.pool{color:var(--y)}
+.cs-val.peserta{color:var(--text)}
+.cs-val.fee{color:var(--g)}
+.cs-val.waktu{color:var(--o)}
+
+/* EST HADIAH */
+.est-hadiah{margin-bottom:14px;padding:10px 12px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.12);border-radius:10px}
+.est-title{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.est-rows{display:flex;flex-direction:column;gap:4px}
+.est-row{display:flex;justify-content:space-between;font-size:12px}
+.est-pos{color:var(--muted)}
+.est-val{font-weight:600;color:var(--g)}
+
+/* COUNTDOWN */
+.countdown-wrap{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:var(--muted)}
+.countdown-val{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--o)}
+.progress-bar{flex:1;height:4px;background:var(--dark4);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width 1s linear}
+
+/* CARD FOOTER */
+.card-footer{display:flex;gap:10px;align-items:center}
+.btn-ikut{flex:1;padding:12px;background:var(--y);color:var(--dark);border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:none;transition:transform .15s,box-shadow .15s}
+@media(max-width:768px){.btn-ikut{cursor:auto}}
+.btn-ikut:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(255,214,0,.3)}
+.btn-ikut.gratis-btn{background:var(--g);color:var(--dark)}
+.btn-ikut.gratis-btn:hover{box-shadow:0 6px 20px rgba(0,230,118,.3)}
+.btn-ikut:disabled{opacity:.5;transform:none;box-shadow:none;cursor:not-allowed}
+.btn-detail{padding:12px 14px;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;cursor:none;transition:all .15s}
+@media(max-width:768px){.btn-detail{cursor:auto}}
+.btn-detail:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+
+/* MIN PESERTA WARNING */
+.min-warn{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;padding:6px 10px;background:rgba(255,214,0,.05);border-radius:8px;border:1px solid rgba(255,214,0,.1)}
+.min-warn span{color:var(--y);font-weight:600}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:14px;display:block}
+.empty-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px}
+
+/* MODAL KONFIRMASI */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(7,7,15,.85);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:32px 28px;max-width:400px;width:100%;box-shadow:0 32px 60px rgba(0,0,0,.5)}
+.modal-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;margin-bottom:8px}
+.modal-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+.modal-info{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;padding:14px;background:var(--dark3);border-radius:14px;border:1px solid var(--border)}
+.mi-row{display:flex;justify-content:space-between;font-size:13px}
+.mi-label{color:var(--muted)}
+.mi-val{font-weight:600}
+.modal-warn{background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--y);line-height:1.6;margin-bottom:20px}
+.modal-btns{display:flex;gap:10px}
+.modal-btn-ok{flex:1;padding:13px;background:var(--y);color:var(--dark);border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:none;transition:transform .15s}
+.modal-btn-ok:hover{transform:scale(1.02)}
+.modal-btn-cancel{flex:1;padding:13px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;font-size:14px;cursor:none;transition:all .15s}
+.modal-btn-cancel:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+@media(max-width:768px){.modal-btn-ok,.modal-btn-cancel{cursor:auto}}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g);color:var(--dark);padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.warn{background:var(--o)}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+<div class="mesh"><div class="blob b1"></div><div class="blob b2"></div></div>
+<div class="toast" id="toast">✅ Berhasil ikut turnamen!</div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">⚡<span>Skill</span>Arena<span>.id</span></a>
+  <div class="nav-r">
+    <div class="nav-balance">
+      <div class="bal-item"><span class="bal-icon">💰</span><span class="bal-val" id="saldo">Rp 25.000</span></div>
+      <div class="bal-item"><span class="bal-icon">🪙</span><span class="bal-val" id="koin">45 koin</span></div>
+    </div>
+    <a href="register.html" class="btn-daftar">👤 Akun</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="page-header">
+    <div class="page-title">⚡ Turnamen Aktif</div>
+    <div class="page-sub">Pilih kategori favoritmu — masuk kapan saja dalam window waktu yang tersedia</div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-wrap" id="filterWrap">
+    <button class="filter-btn active" onclick="filterCat('semua',this)">🔥 Semua</button>
+    <button class="filter-btn" onclick="filterCat('sejarah',this)">🇮🇩 Sejarah</button>
+    <button class="filter-btn" onclick="filterCat('olahraga',this)">⚽ Olahraga</button>
+    <button class="filter-btn" onclick="filterCat('sains',this)">🔬 Sains</button>
+    <button class="filter-btn" onclick="filterCat('logika',this)">🧠 Logika</button>
+    <button class="filter-btn" onclick="filterCat('ekonomi',this)">📈 Ekonomi</button>
+    <button class="filter-btn" onclick="filterCat('kuliner',this)">🍜 Kuliner</button>
+    <button class="filter-btn" onclick="filterCat('gratis',this)">🎁 Gratis</button>
+  </div>
+
+  <!-- TURNAMEN BESAR -->
+  <div id="section-besar">
+    <div class="session-label">
+      <div class="sess-title">⭐ Turnamen Besar — Sesi Malam 20.00</div>
+      <span class="sess-badge" style="background:rgba(255,214,0,.12);color:var(--y)">PRIME TIME</span>
+      <div class="sess-line"></div>
+    </div>
+    <div class="tour-grid" id="grid-besar"></div>
+  </div>
+
+  <!-- TURNAMEN CEPAT -->
+  <div id="section-cepat">
+    <div class="session-label">
+      <div class="sess-title">🚀 Turnamen Cepat — Always On</div>
+      <span class="sess-badge" style="background:rgba(0,230,118,.1);color:var(--g)">SETIAP 30 MENIT</span>
+      <div class="sess-line"></div>
+    </div>
+    <div class="tour-grid" id="grid-cepat"></div>
+  </div>
+
+  <!-- TURNAMEN GRATIS -->
+  <div id="section-gratis">
+    <div class="session-label">
+      <div class="sess-title">🎁 Turnamen Gratis — Latihan</div>
+      <span class="sess-badge" style="background:rgba(162,89,255,.1);color:var(--p)">GRATIS</span>
+      <div class="sess-line"></div>
+    </div>
+    <div class="tour-grid" id="grid-gratis"></div>
+  </div>
+
+</div>
+
+<!-- MODAL KONFIRMASI -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Ikut Turnamen?</div>
+    <div class="modal-sub" id="modalSub">Pastikan kamu siap sebelum masuk turnamen.</div>
+    <div class="modal-info">
+      <div class="mi-row"><span class="mi-label">Kategori</span><span class="mi-val" id="mCat">—</span></div>
+      <div class="mi-row"><span class="mi-label">Entry fee</span><span class="mi-val" id="mFee">—</span></div>
+      <div class="mi-row"><span class="mi-label">Prize pool saat ini</span><span class="mi-val" id="mPool" style="color:var(--y)">—</span></div>
+      <div class="mi-row"><span class="mi-label">Est. Juara 1</span><span class="mi-val" id="mPrize" style="color:var(--g)">—</span></div>
+      <div class="mi-row"><span class="mi-label">Peserta saat ini</span><span class="mi-val" id="mPeserta">—</span></div>
+      <div class="mi-row"><span class="mi-label">Tutup dalam</span><span class="mi-val" id="mTutup" style="color:var(--o)">—</span></div>
+    </div>
+    <div class="modal-warn" id="modalWarn" style="display:none"></div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="modal-btn-ok" id="modalOkBtn" onclick="konfirmasiIkut()">Ikut Sekarang →</button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6">
+      Soal diacak dari bank soal. Tidak ada jaminan menang meski skill tinggi.
+    </p>
+  </div>
+</div>
+
+<script>
+/* ── CURSOR ── */
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(a)})();
+function bindCursor(){
+  document.querySelectorAll('button,a,.tour-card').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2) translate(-25%,-25%)';curR.style.transform='scale(1.4) translate(-18%,-18%)'});
+    el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1) translate(-50%,-50%)';curR.style.transform='scale(1) translate(-50%,-50%)'});
+  });
+}
+
+/* ── DATA TURNAMEN ── */
+const ENTRY=5000;
+const now=Date.now();
+function minsFromNow(m){return now+m*60*1000}
+
+const TURNAMEN=[
+  // BESAR
+  {id:'b1',tipe:'besar',cat:'sejarah',em:'🇮🇩',nama:'Sejarah & Budaya Indonesia',fee:10000,peserta:89,maxP:208,tutup:minsFromNow(47),featured:true},
+  {id:'b2',tipe:'besar',cat:'olahraga',em:'⚽',nama:'Olahraga & Hiburan',fee:10000,peserta:124,maxP:208,tutup:minsFromNow(47)},
+  {id:'b3',tipe:'besar',cat:'sains',em:'🔬',nama:'Sains & Teknologi',fee:10000,peserta:67,maxP:208,tutup:minsFromNow(47)},
+  {id:'b4',tipe:'besar',cat:'logika',em:'🧠',nama:'Penalaran & Logika',fee:10000,peserta:103,maxP:208,tutup:minsFromNow(47)},
+  {id:'b5',tipe:'besar',cat:'ekonomi',em:'📈',nama:'Ekonomi & Bisnis',fee:10000,peserta:58,maxP:208,tutup:minsFromNow(47)},
+  {id:'b6',tipe:'besar',cat:'kuliner',em:'🍜',nama:'Budaya & Kuliner Nusantara',fee:10000,peserta:72,maxP:208,tutup:minsFromNow(47)},
+  // CEPAT
+  {id:'c1',tipe:'cepat',cat:'sejarah',em:'🇮🇩',nama:'Sejarah Indonesia',fee:5000,peserta:23,maxP:416,tutup:minsFromNow(12)},
+  {id:'c2',tipe:'cepat',cat:'olahraga',em:'⚽',nama:'Olahraga & Hiburan',fee:5000,peserta:31,maxP:416,tutup:minsFromNow(18)},
+  {id:'c3',tipe:'cepat',cat:'sains',em:'🔬',nama:'Sains & Teknologi',fee:5000,peserta:14,maxP:416,tutup:minsFromNow(24)},
+  {id:'c4',tipe:'cepat',cat:'logika',em:'🧠',nama:'Penalaran & Logika',fee:5000,peserta:19,maxP:416,tutup:minsFromNow(8)},
+  {id:'c5',tipe:'cepat',cat:'kuliner',em:'🍜',nama:'Budaya & Kuliner',fee:3000,peserta:9,maxP:694,tutup:minsFromNow(22)},
+  // GRATIS
+  {id:'g1',tipe:'gratis',cat:'sejarah',em:'🇮🇩',nama:'Latihan Sejarah Indonesia',fee:0,peserta:156,maxP:9999,tutup:minsFromNow(55)},
+  {id:'g2',tipe:'gratis',cat:'olahraga',em:'⚽',nama:'Latihan Olahraga',fee:0,peserta:98,maxP:9999,tutup:minsFromNow(55)},
+];
+
+/* ── KALKULASI ── */
+function getFee(t){const p=t.fee*t.peserta;return p>=200000?0.10:p>=50000?0.12:0.15}
+function getPool(t){return t.fee*t.peserta}
+function getNetPool(t){const pool=getPool(t);return Math.round(pool*(1-getFee(t)))}
+function getPrize1(t){
+  const net=getNetPool(t);const n=t.peserta;
+  if(n>=100)return Math.round(net*.25);
+  if(n>=10)return Math.round(net*.30);
+  if(n>=4)return Math.round(net*.40);
+  return 0;
+}
+function getRemainingMins(t){return Math.max(0,Math.floor((t.tutup-Date.now())/60000))}
+function getRemainingPct(t){const total=30*60*1000;const rem=t.tutup-Date.now();return Math.max(0,Math.min(100,rem/total*100))}
+function formatRp(n){if(n>=1000000)return'Rp '+(n/1000000).toFixed(1)+'Jt';if(n>=1000)return'Rp '+Math.round(n/1000)+'K';return'Rp '+n}
+
+/* ── RENDER CARD ── */
+function renderCard(t){
+  const net=getNetPool(t);
+  const prize1=getPrize1(t);
+  const prize2=t.peserta>=10?Math.round(getNetPool(t)*.20):Math.round(getNetPool(t)*.25);
+  const feePct=Math.round(getFee(t)*100);
+  const mins=getRemainingMins(t);
+  const pct=getRemainingPct(t);
+  const isGratis=t.fee===0;
+  const minPeserta=t.peserta<4&&!isGratis;
+  const progColor=mins<=5?'var(--r)':mins<=15?'var(--o)':'var(--g)';
+
+  return `
+  <div class="tour-card ${t.featured?'featured':''} ${isGratis?'gratis':''}" data-cat="${t.cat}" data-tipe="${t.tipe}">
+    <div class="card-head">
+      <div class="card-cat">
+        <div class="cat-em2">${t.em}</div>
+        <div class="cat-info">
+          <div class="cat-name2">${t.nama}</div>
+          <div class="cat-type">${t.tipe==='besar'?'Turnamen Besar':t.tipe==='cepat'?'Turnamen Cepat':'Mode Latihan'} · 10 soal</div>
+        </div>
+      </div>
+      <div class="card-badges">
+        <div class="badge-live"><div class="live-dot2"></div>LIVE</div>
+        ${t.featured?'<div class="badge-feat">⭐ PRIME</div>':''}
+        ${isGratis?'<div class="badge-free">GRATIS</div>':''}
+      </div>
+    </div>
+
+    <div class="card-stats">
+      <div class="cs">
+        <div class="cs-label">Prize Pool</div>
+        <div class="cs-val pool">${isGratis?'XP + Koin':formatRp(net)}</div>
+      </div>
+      <div class="cs">
+        <div class="cs-label">Peserta</div>
+        <div class="cs-val peserta">${t.peserta} orang</div>
+      </div>
+      <div class="cs">
+        <div class="cs-label">Entry Fee</div>
+        <div class="cs-val fee">${isGratis?'Gratis':formatRp(t.fee)}</div>
+      </div>
+      <div class="cs">
+        <div class="cs-label">Fee Platform</div>
+        <div class="cs-val" style="color:var(--muted)">${isGratis?'-':feePct+'%'}</div>
+      </div>
+    </div>
+
+    ${!isGratis&&t.peserta>=4?`
+    <div class="est-hadiah">
+      <div class="est-title">Estimasi Hadiah Saat Ini</div>
+      <div class="est-rows">
+        <div class="est-row"><span class="est-pos">🥇 Juara 1</span><span class="est-val">~${formatRp(prize1)}</span></div>
+        <div class="est-row"><span class="est-pos">🥈 Juara 2</span><span class="est-val">~${formatRp(prize2)}</span></div>
+        <div class="est-row" style="font-size:10px;color:var(--muted)"><span>*berdasarkan peserta saat ini</span><span style="color:var(--muted)">WD 100% full</span></div>
+      </div>
+    </div>`:
+    !isGratis&&t.peserta<4?`
+    <div style="padding:10px 12px;background:rgba(162,89,255,.06);border:1px solid rgba(162,89,255,.15);border-radius:10px;margin-bottom:14px;font-size:12px;color:var(--p);line-height:1.6">
+      ⚠️ Butuh min. 4 peserta untuk berbayar. Saat ini ${t.peserta} peserta. Jika tetap &lt; 4 saat tutup, otomatis gratis + refund saldo.
+    </div>`:''}
+
+    <div class="countdown-wrap">
+      <span>⏰ Tutup dalam</span>
+      <span class="countdown-val" id="cd-${t.id}">${mins}m</span>
+      <div class="progress-bar"><div class="progress-fill" id="pf-${t.id}" style="width:${pct}%;background:${progColor}"></div></div>
+    </div>
+
+    <div class="card-footer">
+      <button class="btn-ikut ${isGratis?'gratis-btn':''}" onclick="bukaModal('${t.id}')">
+        ${isGratis?'🎁 Ikut Gratis':'⚡ Ikut — '+formatRp(t.fee)}
+      </button>
+      <button class="btn-detail" onclick="window.location.href='game.html'">▶</button>
+    </div>
+    ${minPeserta?`<div class="min-warn">Min. <span>4 peserta</span> untuk berbayar. Saat ini ${t.peserta} — masih butuh ${4-t.peserta} lagi.</div>`:''}
+  </div>`;
+}
+
+/* ── RENDER SEMUA ── */
+let currentFilter='semua';
+function renderAll(){
+  const filtered=cat=>TURNAMEN.filter(t=>t.tipe===cat&&(currentFilter==='semua'||t.cat===currentFilter||currentFilter==='gratis'&&t.tipe==='gratis'));
+  document.getElementById('grid-besar').innerHTML=filtered('besar').map(renderCard).join('')||'<div class="empty"><span class="empty-icon">🔍</span><div class="empty-title">Tidak ada turnamen</div></div>';
+  document.getElementById('grid-cepat').innerHTML=filtered('cepat').map(renderCard).join('')||'<div class="empty"><span class="empty-icon">🔍</span><div class="empty-title">Tidak ada turnamen</div></div>';
+  document.getElementById('grid-gratis').innerHTML=filtered('gratis').map(renderCard).join('')||'';
+  if(currentFilter==='gratis'){document.getElementById('section-besar').style.display='none';document.getElementById('section-cepat').style.display='none'}
+  else{document.getElementById('section-besar').style.display='';document.getElementById('section-cepat').style.display=''}
+  bindCursor();
+}
+
+function filterCat(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+/* ── COUNTDOWN UPDATE ── */
+setInterval(()=>{
+  TURNAMEN.forEach(t=>{
+    const el=document.getElementById('cd-'+t.id);
+    const pf=document.getElementById('pf-'+t.id);
+    if(!el)return;
+    const mins=getRemainingMins(t);
+    const secs=Math.floor(Math.max(0,(t.tutup-Date.now())/1000));
+    const m=Math.floor(secs/60),s=secs%60;
+    el.textContent=m+':'+(s<10?'0':'')+s;
+    if(pf){
+      const pct=getRemainingPct(t);
+      pf.style.width=pct+'%';
+      pf.style.background=mins<=5?'var(--r)':mins<=15?'var(--o)':'var(--g)';
+    }
+    // Simulasi peserta naik
+    if(Math.random()>.92)t.peserta=Math.min(t.peserta+1,t.maxP);
+  });
+},1000);
+
+/* ── MODAL ── */
+let activeTourId=null;
+function bukaModal(id){
+  const t=TURNAMEN.find(x=>x.id===id);
+  if(!t)return;
+  activeTourId=id;
+  const isGratis=t.fee===0;
+  const mins=getRemainingMins(t);
+  const net=getNetPool(t);
+  document.getElementById('modalTitle').textContent=isGratis?'Ikut Turnamen Gratis?':'Konfirmasi Ikut Turnamen';
+  document.getElementById('modalSub').textContent=t.nama+' · '+t.em;
+  document.getElementById('mCat').textContent=t.em+' '+t.nama;
+  document.getElementById('mFee').textContent=isGratis?'Gratis':formatRp(t.fee);
+  document.getElementById('mPool').textContent=isGratis?'XP + Koin':formatRp(net);
+  document.getElementById('mPrize').textContent=isGratis?'XP + Koin':'~'+formatRp(getPrize1(t));
+  document.getElementById('mPeserta').textContent=t.peserta+' orang';
+  document.getElementById('mTutup').textContent=mins+' menit lagi';
+  const warn=document.getElementById('modalWarn');
+  if(!isGratis&&t.peserta<4){
+    warn.style.display='block';
+    warn.textContent='⚠️ Peserta masih '+t.peserta+'/4. Jika tetap kurang dari 4 saat tutup, turnamen otomatis gratis dan saldo dikembalikan penuh.';
+  }else{warn.style.display='none'}
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+  activeTourId=null;
+}
+
+function konfirmasiIkut(){
+  closeModal();
+  showToast('✅ Berhasil masuk turnamen! Memuat soal...','ok');
+  setTimeout(()=>window.location.href='game.html',1200);
+}
+
+/* ── TOAST ── */
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast '+(type==='warn'?'warn':'')+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ── INIT ── */
+renderAll();
+// Update peserta simulasi setiap 4 detik
+setInterval(()=>{renderAll()},8000);
+</script>
+</body>
+</html>

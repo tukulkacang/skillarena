@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillArena.id — Mode Latihan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--y:#FFD600;--o:#FF4D00;--g:#00E676;--p:#A259FF;--r:#FF3366;--dark:#07070F;--dark2:#0F0F1A;--dark3:#171726;--dark4:#1F1F32;--text:#F0F0FF;--muted:#6B6B90;--border:rgba(255,255,255,0.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none}
+@media(max-width:768px){body{cursor:auto}}
+.cur{width:10px;height:10px;background:var(--y);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:transform .1s}
+.cur-r{width:34px;height:34px;border:1.5px solid rgba(255,214,0,.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .12s ease}
+@media(max-width:768px){.cur,.cur-r{display:none}}
+.mesh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(100px);opacity:.07;animation:fb 12s ease-in-out infinite}
+.b1{width:500px;height:500px;background:var(--p);top:-150px;left:-150px}
+.b2{width:400px;height:400px;background:var(--g);bottom:-100px;right:-100px;animation-delay:-5s}
+@keyframes fb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+
+nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;z-index:100;background:rgba(7,7,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:900;color:var(--y);text-decoration:none;letter-spacing:-.5px}
+.logo span{color:var(--text)}
+.nav-r{display:flex;gap:12px}
+.nav-btn{padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;cursor:none;border:none;font-family:'Plus Jakarta Sans',sans-serif}
+@media(max-width:768px){.nav-btn{cursor:auto}}
+.nav-btn.primary{background:var(--y);color:var(--dark)}
+.nav-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted)}
+
+.main{max-width:800px;margin:0 auto;padding:88px 20px 40px;position:relative;z-index:1}
+.page-header{margin-bottom:28px}
+.page-title{font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted);line-height:1.6}
+
+/* CAT TABS */
+.cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.cat-tab{padding:8px 16px;background:var(--dark3);border:1px solid var(--border);border-radius:100px;font-size:13px;font-weight:500;color:var(--muted);cursor:none;transition:all .15s}
+@media(max-width:768px){.cat-tab{cursor:auto}}
+.cat-tab.active{background:var(--p);color:#fff;border-color:var(--p)}
+.cat-tab:hover:not(.active){border-color:rgba(255,255,255,.15);color:var(--text)}
+
+/* MODE SELECT */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+@media(max-width:480px){.mode-grid{grid-template-columns:1fr}}
+.mode-card{padding:20px;background:var(--dark3);border:1px solid var(--border);border-radius:18px;cursor:none;transition:all .2s;text-align:left}
+@media(max-width:768px){.mode-card{cursor:auto}}
+.mode-card.active{border-color:rgba(162,89,255,.4);background:rgba(162,89,255,.06)}
+.mode-card:hover:not(.active){border-color:rgba(255,255,255,.12);transform:translateY(-2px)}
+.mode-em{font-size:28px;margin-bottom:10px;display:block}
+.mode-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:4px}
+.mode-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* PRACTICE AREA */
+.practice-area{display:none}
+.practice-area.show{display:block}
+
+/* SOAL LATIHAN */
+.latihan-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.lat-prog{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.lat-prog-bar{width:120px;height:4px;background:var(--dark4);border-radius:2px;overflow:hidden}
+.lat-prog-fill{height:100%;background:var(--p);border-radius:2px;transition:width .3s}
+.lat-xp{font-size:12px;color:var(--p);font-weight:600}
+
+.q-card{background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;margin-bottom:16px}
+.q-cat-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--p);background:rgba(162,89,255,.08);border:1px solid rgba(162,89,255,.2);padding:4px 12px;border-radius:100px;margin-bottom:14px}
+.q-text{font-family:'Syne',sans-serif;font-size:clamp(15px,2vw,20px);font-weight:700;line-height:1.4;margin-bottom:6px}
+.q-note{font-size:11px;color:var(--muted)}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:480px){.opts{grid-template-columns:1fr}}
+.opt{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;cursor:none;transition:all .15s;text-align:left;width:100%}
+@media(max-width:768px){.opt{cursor:auto}}
+.opt:hover{border-color:rgba(162,89,255,.3);transform:translateY(-1px)}
+.opt.correct{background:rgba(0,230,118,.1);border-color:var(--g)}
+.opt.wrong{background:rgba(255,51,102,.08);border-color:var(--r)}
+.opt.disabled{pointer-events:none}
+.opt-l{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:var(--dark4);font-size:11px;font-weight:700;margin-bottom:6px;color:var(--muted);transition:all .15s}
+.opt:hover .opt-l{background:var(--p);color:#fff}
+.opt.correct .opt-l{background:var(--g);color:var(--dark)}
+.opt.wrong .opt-l{background:var(--r);color:#fff}
+.opt-text{font-size:13px;font-weight:500;line-height:1.5;display:block;color:var(--text)}
+
+/* EXPLANATION */
+.explanation{padding:16px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);border-radius:14px;margin-bottom:16px;display:none;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.explanation.show{display:block}
+.exp-title{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--g);margin-bottom:8px}
+.exp-text{font-size:13px;color:var(--muted);line-height:1.7}
+.exp-text strong{color:var(--text)}
+
+.next-btn{width:100%;padding:13px;background:var(--p);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:none;transition:transform .15s}
+@media(max-width:768px){.next-btn{cursor:auto}}
+.next-btn:hover{transform:scale(1.01)}
+
+/* SCORE BAR */
+.score-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--dark3);border:1px solid var(--border);border-radius:14px;margin-bottom:20px;font-size:13px}
+.sb-item{display:flex;align-items:center;gap:6px}
+.sb-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:700}
+
+/* RINGKASAN AKHIR */
+.ringkasan{display:none;text-align:center;padding:28px 0;animation:fadeIn .4s ease}
+.ringkasan.show{display:block}
+.ring-icon{font-size:52px;display:block;margin-bottom:12px}
+.ring-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:900;margin-bottom:8px}
+.ring-sub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.ring-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.ring-stat{background:var(--dark3);border-radius:12px;padding:14px;text-align:center}
+.ring-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;display:block;margin-bottom:2px}
+.ring-lbl{font-size:10px;color:var(--muted);text-transform:uppercase}
+.ring-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ring-btn{padding:12px 24px;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:none;transition:all .15s;border:none;text-decoration:none;display:inline-block;text-align:center}
+@media(max-width:768px){.ring-btn{cursor:auto}}
+.ring-btn.primary{background:var(--y);color:var(--dark)}
+.ring-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+<div class="mesh"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+<nav>
+  <a href="index.html" class="logo">⚡<span>Skill</span>Arena</a>
+  <div class="nav-r">
+    <a href="turnamen.html" class="nav-btn primary">⚡ Ikut Turnamen</a>
+    <a href="dashboard.html" class="nav-btn secondary">📊 Dashboard</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-header">
+    <div class="page-title">📚 Mode Latihan</div>
+    <div class="page-sub">Tingkatkan skill kamu gratis — tanpa uang, tanpa timer ketat. Soal berbeda tiap sesi, penjelasan setelah tiap jawaban.</div>
+  </div>
+
+  <!-- KATEGORI -->
+  <div class="cat-tabs" id="catTabs">
+    <button class="cat-tab active" onclick="setCat('sejarah',this)">🇮🇩 Sejarah</button>
+    <button class="cat-tab" onclick="setCat('olahraga',this)">⚽ Olahraga</button>
+    <button class="cat-tab" onclick="setCat('sains',this)">🔬 Sains</button>
+    <button class="cat-tab" onclick="setCat('logika',this)">🧠 Logika</button>
+    <button class="cat-tab" onclick="setCat('ekonomi',this)">📈 Ekonomi</button>
+    <button class="cat-tab" onclick="setCat('kuliner',this)">🍜 Kuliner</button>
+  </div>
+
+  <!-- MODE -->
+  <div id="modeSection">
+    <div class="mode-grid">
+      <button class="mode-card active" onclick="setMode('latihan',this)">
+        <span class="mode-em">🎯</span>
+        <div class="mode-name">Latihan Bebas</div>
+        <div class="mode-desc">Jawab soal, lihat penjelasan langsung. Tidak ada timer. Fokus ke pemahaman.</div>
+      </button>
+      <button class="mode-card" onclick="setMode('kilat',this)">
+        <span class="mode-em">⚡</span>
+        <div class="mode-name">Latihan Kilat</div>
+        <div class="mode-desc">Timer 10 detik seperti turnamen. Persiapan sebelum masuk turnamen berbayar.</div>
+      </button>
+    </div>
+    <button onclick="mulaiLatihan()" style="width:100%;padding:14px;background:var(--p);color:#fff;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:none;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 8px 24px rgba(162,89,255,.3)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      Mulai Latihan →
+    </button>
+  </div>
+
+  <!-- PRACTICE AREA -->
+  <div class="practice-area" id="practiceArea">
+    <div class="score-bar">
+      <div class="sb-item"><span>✅</span><span class="sb-val" id="correctCount" style="color:var(--g)">0</span><span style="color:var(--muted)">benar</span></div>
+      <div class="sb-item"><span>❌</span><span class="sb-val" id="wrongCount" style="color:var(--r)">0</span><span style="color:var(--muted)">salah</span></div>
+      <div class="sb-item"><span>🪙</span><span class="sb-val" id="xpCount" style="color:var(--p)">+0 XP</span></div>
+    </div>
+
+    <div class="latihan-header">
+      <div class="lat-prog">
+        <span id="progText">Soal 1/10</span>
+        <div class="lat-prog-bar"><div class="lat-prog-fill" id="progFill" style="width:10%"></div></div>
+      </div>
+      <button onclick="stopLatihan()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Stop</button>
+    </div>
+
+    <div class="q-card">
+      <div class="q-cat-badge" id="qCat">🇮🇩 Sejarah Indonesia</div>
+      <div class="q-text" id="qText">Memuat soal...</div>
+      <div class="q-note">Tidak ada timer · Fokus ke pemahaman</div>
+    </div>
+
+    <div class="opts" id="optsGrid"></div>
+
+    <div class="explanation" id="explanation">
+      <div class="exp-title">📖 Penjelasan</div>
+      <div class="exp-text" id="expText"></div>
+    </div>
+
+    <button class="next-btn" id="nextBtn" onclick="nextSoal()" style="display:none">
+      Soal Berikutnya →
+    </button>
+
+    <!-- RINGKASAN -->
+    <div class="ringkasan" id="ringkasan">
+      <span class="ring-icon" id="ringIcon">🎉</span>
+      <div class="ring-title" id="ringTitle">Latihan Selesai!</div>
+      <div class="ring-sub" id="ringSub">Bagus! Kamu sudah latihan dengan baik.</div>
+      <div class="ring-stats">
+        <div class="ring-stat"><span class="ring-val" id="rCorrect" style="color:var(--g)">0</span><span class="ring-lbl">Benar</span></div>
+        <div class="ring-stat"><span class="ring-val" id="rWrong" style="color:var(--r)">0</span><span class="ring-lbl">Salah</span></div>
+        <div class="ring-stat"><span class="ring-val" id="rXP" style="color:var(--p)">0</span><span class="ring-lbl">XP Didapat</span></div>
+      </div>
+      <div class="ring-btns">
+        <button class="ring-btn primary" onclick="mulaiLagi()">🔄 Latihan Lagi</button>
+        <a href="turnamen.html" class="ring-btn secondary">⚡ Ikut Turnamen</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(a)})();
+
+const SOAL_DATA={
+  sejarah:[
+    {q:'Pada tanggal berapa Indonesia memproklamasikan kemerdekaannya?',opts:['17 Agustus 1945','1 Juni 1945','20 Mei 1908','18 Agustus 1945'],ans:0,exp:'Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945 di Jalan Pegangsaan Timur 56, Jakarta, dibacakan oleh Sukarno-Hatta.'},
+    {q:'Siapakah yang membacakan teks Proklamasi Kemerdekaan?',opts:['Hatta & Sjahrir','Sukarno & Hatta','Sukarno & Sjahrir','Sutan Sjahrir'],ans:1,exp:'Ir. Sukarno membacakan teks proklamasi, didampingi Drs. Mohammad Hatta sebagai perwakilan bangsa Indonesia.'},
+    {q:'Apa nama kerajaan Hindu-Buddha terbesar di Nusantara?',opts:['Sriwijaya','Singasari','Majapahit','Mataram'],ans:2,exp:'Kerajaan Majapahit (1293-1527) adalah kerajaan terbesar, mencakup hampir seluruh Nusantara dan sebagian Asia Tenggara.'},
+    {q:'Kapan Sumpah Pemuda dikumandangkan?',opts:['17 Agustus 1945','28 Oktober 1928','20 Mei 1908','1 Juni 1945'],ans:1,exp:'Sumpah Pemuda dikumandangkan pada 28 Oktober 1928, dalam Kongres Pemuda II di Batavia (Jakarta).'},
+    {q:'Siapakah pahlawan nasional yang dikenal sebagai "Bapak Pendidikan Nasional"?',opts:['Ir. Soekarno','Ki Hajar Dewantara','Mohammad Hatta','Wahidin Sudirohusodo'],ans:1,exp:'Ki Hajar Dewantara adalah pendiri Taman Siswa dan dikenal sebagai Bapak Pendidikan Nasional. Lahir 2 Mei, diperingati sebagai Hari Pendidikan Nasional.'},
+  ],
+  olahraga:[
+    {q:'Siapakah pemain bulu tangkis Indonesia yang dijuluki "Si Smash"?',opts:['Rudy Hartono','Liem Swie King','Kevin Sanjaya','Taufik Hidayat'],ans:1,exp:'Liem Swie King dijuluki "Si Smash" karena smash kerasnya yang legendaris. Ia meraih 3 gelar All England (1978, 1979, 1981).'},
+    {q:'Indonesia pertama kali memenangkan medali emas Olimpiade pada tahun?',opts:['1988','1992','1996','2000'],ans:1,exp:'Indonesia meraih medali emas pertama di Olimpiade Barcelona 1992 melalui cabang bulu tangkis: Alan Budikusuma (tunggal putra) dan Susi Susanti (tunggal putri).'},
+    {q:'Berapa jumlah pemain sepak bola dalam satu tim di lapangan?',opts:['9','10','11','12'],ans:2,exp:'Satu tim sepak bola terdiri dari 11 pemain di lapangan, termasuk 1 kiper dan 10 pemain lapangan.'},
+  ],
+  sains:[
+    {q:'Apa simbol kimia untuk emas?',opts:['Au','Ag','Fe','Cu'],ans:0,exp:'Simbol kimia emas adalah Au, dari bahasa Latin "Aurum". Nomor atom emas adalah 79.'},
+    {q:'Planet apa yang terbesar di tata surya?',opts:['Saturnus','Uranus','Neptunus','Yupiter'],ans:3,exp:'Yupiter adalah planet terbesar di tata surya — massanya lebih dari dua kali massa semua planet lain digabungkan.'},
+    {q:'Berapa kecepatan cahaya dalam vakum (perdetik)?',opts:['200.000 km','300.000 km','400.000 km','500.000 km'],ans:1,exp:'Kecepatan cahaya dalam vakum adalah sekitar 299.792 km/detik, dibulatkan menjadi 300.000 km/detik.'},
+  ],
+  logika:[
+    {q:'Jika semua A adalah B, dan semua B adalah C, maka?',opts:['Semua C adalah A','Semua A adalah C','Semua B adalah A','Tidak bisa disimpulkan'],ans:1,exp:'Ini adalah silogisme sederhana. Jika A⊂B dan B⊂C, maka A⊂C. Sehingga "Semua A adalah C" adalah kesimpulan yang valid.'},
+    {q:'Angka berapa yang melanjutkan deret: 2, 4, 8, 16, ...?',opts:['20','24','32','36'],ans:2,exp:'Deret ini adalah deret geometri dengan rasio 2. Setiap angka dikali 2: 2×2=4, 4×2=8, 8×2=16, 16×2=32.'},
+  ],
+  ekonomi:[
+    {q:'Apa kepanjangan dari GDP?',opts:['Gross Domestic Product','General Domestic Price','Grand Development Plan','Global Distribution Point'],ans:0,exp:'GDP (Gross Domestic Product) atau PDB (Produk Domestik Bruto) adalah nilai total barang dan jasa yang diproduksi dalam suatu negara dalam periode tertentu.'},
+    {q:'Inflasi terjadi ketika?',opts:['Harga barang turun','Nilai mata uang naik','Harga barang naik secara umum','Pengangguran meningkat'],ans:2,exp:'Inflasi adalah kenaikan harga barang dan jasa secara umum dan terus-menerus, yang menyebabkan daya beli mata uang menurun.'},
+  ],
+  kuliner:[
+    {q:'Rendang berasal dari suku/daerah mana di Indonesia?',opts:['Jawa','Sunda','Minangkabau','Bugis'],ans:2,exp:'Rendang adalah masakan tradisional Minangkabau (Sumatera Barat) yang dimasak dengan santan dan rempah selama berjam-jam hingga kering.'},
+    {q:'Apa bahan utama dari tempe?',opts:['Kacang tanah','Kedelai','Jagung','Singkong'],ans:1,exp:'Tempe dibuat dari fermentasi kedelai menggunakan jamur Rhizopus oligosporus. Tempe adalah makanan berprotein tinggi khas Indonesia.'},
+  ],
+};
+
+let cat='sejarah',mode='latihan',soalList=[],idx=0,correct=0,wrong=0,xp=0;
+
+function setCat(c,btn){cat=c;document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+function setMode(m,btn){mode=m;document.querySelectorAll('.mode-card').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+
+function mulaiLatihan(){
+  soalList=[...(SOAL_DATA[cat]||SOAL_DATA.sejarah)].sort(()=>Math.random()-.5).slice(0,5);
+  idx=0;correct=0;wrong=0;xp=0;
+  document.getElementById('modeSection').style.display='none';
+  document.getElementById('practiceArea').classList.add('show');
+  document.getElementById('ringkasan').classList.remove('show');
+  document.getElementById('optsGrid').style.display='grid';
+  document.getElementById('practiceArea').querySelector('.q-card').style.display='block';
+  document.getElementById('practiceArea').querySelector('.score-bar').style.display='flex';
+  document.getElementById('practiceArea').querySelector('.latihan-header').style.display='flex';
+  updateScore();loadSoal();
+}
+
+function loadSoal(){
+  if(idx>=soalList.length){showRingkasan();return}
+  const s=soalList[idx];
+  document.getElementById('qCat').textContent={sejarah:'🇮🇩 Sejarah Indonesia',olahraga:'⚽ Olahraga',sains:'🔬 Sains',logika:'🧠 Logika',ekonomi:'📈 Ekonomi',kuliner:'🍜 Kuliner'}[cat]||'🧠 Latihan';
+  document.getElementById('qText').textContent=s.q;
+  document.getElementById('progText').textContent='Soal '+(idx+1)+'/'+soalList.length;
+  document.getElementById('progFill').style.width=((idx+1)/soalList.length*100)+'%';
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('nextBtn').style.display='none';
+  const letters=['A','B','C','D'];
+  document.getElementById('optsGrid').innerHTML=s.opts.map((o,i)=>`
+    <button class="opt" onclick="jawab(this,${i})">
+      <span class="opt-l">${letters[i]}</span>
+      <span class="opt-text">${o}</span>
+    </button>
+  `).join('');
+  document.querySelectorAll('.opt').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2) translate(-25%,-25%)';curR.style.transform='scale(1.4) translate(-18%,-18%)'});
+    el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1) translate(-50%,-50%)';curR.style.transform='scale(1) translate(-50%,-50%)'});
+  });
+}
+
+function jawab(btn,i){
+  const s=soalList[idx];
+  document.querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');b.style.pointerEvents='none'});
+  if(i===s.ans){btn.classList.add('correct');correct++;xp+=10}
+  else{btn.classList.add('wrong');document.querySelectorAll('.opt')[s.ans].classList.add('correct');wrong++}
+  document.getElementById('expText').textContent=s.exp;
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('nextBtn').style.display='block';
+  document.getElementById('nextBtn').textContent=idx<soalList.length-1?'Soal Berikutnya →':'Lihat Ringkasan →';
+  updateScore();
+}
+
+function nextSoal(){idx++;loadSoal()}
+
+function updateScore(){
+  document.getElementById('correctCount').textContent=correct;
+  document.getElementById('wrongCount').textContent=wrong;
+  document.getElementById('xpCount').textContent='+'+xp+' XP';
+}
+
+function showRingkasan(){
+  document.getElementById('optsGrid').style.display='none';
+  document.getElementById('practiceArea').querySelector('.q-card').style.display='none';
+  document.getElementById('explanation').classList.remove('show');
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('practiceArea').querySelector('.latihan-header').style.display='none';
+  const r=document.getElementById('ringkasan');
+  r.classList.add('show');
+  document.getElementById('rCorrect').textContent=correct;
+  document.getElementById('rWrong').textContent=wrong;
+  document.getElementById('rXP').textContent=xp;
+  const pct=correct/soalList.length;
+  if(pct>=0.8){document.getElementById('ringIcon').textContent='🏆';document.getElementById('ringTitle').textContent='Luar Biasa!';document.getElementById('ringSub').textContent='Kamu sudah siap ikut turnamen berbayar di kategori ini!'}
+  else if(pct>=0.6){document.getElementById('ringIcon').textContent='🎯';document.getElementById('ringTitle').textContent='Bagus!';document.getElementById('ringSub').textContent='Terus latihan — sedikit lagi kamu siap turnamen!'}
+  else{document.getElementById('ringIcon').textContent='💪';document.getElementById('ringTitle').textContent='Ayo Terus!';document.getElementById('ringSub').textContent='Ulangi latihan untuk tingkatkan pemahaman di kategori ini.'}
+}
+
+function stopLatihan(){
+  document.getElementById('modeSection').style.display='block';
+  document.getElementById('practiceArea').classList.remove('show');
+}
+function mulaiLagi(){
+  document.getElementById('ringkasan').classList.remove('show');
+  document.getElementById('optsGrid').style.display='grid';
+  document.getElementById('practiceArea').querySelector('.q-card').style.display='block';
+  document.getElementById('practiceArea').querySelector('.score-bar').style.display='flex';
+  document.getElementById('practiceArea').querySelector('.latihan-header').style.display='flex';
+  mulaiLatihan();
+}
+
+document.querySelectorAll('button,a').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2) translate(-25%,-25%)';curR.style.transform='scale(1.4) translate(-18%,-18%)'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1) translate(-50%,-50%)';curR.style.transform='scale(1) translate(-50%,-50%)'});
+});
+</script>
+</body>
+</html>

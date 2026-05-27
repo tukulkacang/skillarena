@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillArena.id — Top Up Saldo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--y:#FFD600;--o:#FF4D00;--g:#00E676;--p:#A259FF;--r:#FF3366;--dark:#07070F;--dark2:#0F0F1A;--dark3:#171726;--dark4:#1F1F32;--text:#F0F0FF;--muted:#6B6B90;--border:rgba(255,255,255,0.07)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-x:hidden;cursor:none}
+@media(max-width:768px){body{cursor:auto}}
+.cur{width:10px;height:10px;background:var(--y);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:transform .1s}
+.cur-r{width:34px;height:34px;border:1.5px solid rgba(255,214,0,.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .12s ease}
+@media(max-width:768px){.cur,.cur-r{display:none}}
+.mesh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(100px);opacity:.07;animation:fb 12s ease-in-out infinite}
+.b1{width:500px;height:500px;background:var(--y);top:-200px;left:-200px}
+.b2{width:400px;height:400px;background:var(--g);bottom:-100px;right:-100px;animation-delay:-5s}
+@keyframes fb{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+
+.card{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:36px 32px;width:100%;max-width:440px;position:relative;z-index:1;box-shadow:0 24px 60px rgba(0,0,0,.4);animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)}
+
+.logo-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:900;color:var(--y);text-decoration:none;letter-spacing:-.5px}
+.logo span{color:var(--text)}
+.back-btn{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.back-btn:hover{color:var(--text)}
+
+.page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:900;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+
+/* SALDO DISPLAY */
+.saldo-now{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(255,214,0,.06);border:1px solid rgba(255,214,0,.15);border-radius:14px;margin-bottom:22px}
+.sn-label{font-size:12px;color:var(--muted)}
+.sn-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;color:var(--y)}
+
+/* NOMINAL QUICK SELECT */
+.quick-label{font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:block}
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.quick-btn{padding:12px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);cursor:none;transition:all .15s;text-align:center}
+@media(max-width:768px){.quick-btn{cursor:auto}}
+.quick-btn:hover{border-color:rgba(255,214,0,.3);color:var(--y)}
+.quick-btn.active{background:rgba(255,214,0,.1);border-color:rgba(255,214,0,.4);color:var(--y)}
+
+/* INPUT MANUAL */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.inp-wrap{position:relative}
+.inp-prefix{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:600;color:var(--muted)}
+.inp{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);padding:14px 16px 14px 56px;border-radius:14px;font-size:16px;font-family:'Syne',sans-serif;font-weight:700;outline:none;transition:border-color .2s}
+.inp:focus{border-color:rgba(255,214,0,.4)}
+.inp-note{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* METODE BAYAR */
+.metode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px}
+.metode-btn{padding:12px;background:var(--dark3);border:1px solid var(--border);border-radius:12px;cursor:none;transition:all .15s;text-align:center}
+@media(max-width:768px){.metode-btn{cursor:auto}}
+.metode-btn:hover{border-color:rgba(255,255,255,.15)}
+.metode-btn.active{border-color:rgba(255,214,0,.4);background:rgba(255,214,0,.06)}
+.metode-em{font-size:20px;display:block;margin-bottom:4px}
+.metode-name{font-size:12px;font-weight:600}
+
+/* INFO BOX */
+.info-box{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.15);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--g);line-height:1.7;margin-bottom:20px}
+.info-box.koin{background:rgba(162,89,255,.06);border-color:rgba(162,89,255,.15);color:var(--p)}
+
+/* SUMMARY */
+.summary{padding:14px 16px;background:var(--dark3);border:1px solid var(--border);border-radius:14px;margin-bottom:20px}
+.sum-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--border)}
+.sum-row:last-child{border:none;padding-top:8px;margin-top:4px;font-weight:600;font-size:14px}
+.sum-label{color:var(--muted)}
+.sum-val{font-weight:500}
+.sum-val.green{color:var(--g)}
+.sum-val.free{color:var(--g);font-weight:600}
+
+/* BUTTONS */
+.btn{width:100%;padding:15px;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:none;transition:transform .15s,box-shadow .15s}
+@media(max-width:768px){.btn{cursor:auto}}
+.btn-primary{background:var(--y);color:var(--dark)}
+.btn-primary:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(255,214,0,.3)}
+.btn-primary:disabled{opacity:.5;transform:none}
+.spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,.2);border-top-color:var(--dark);border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+<div class="mesh"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+<div class="card">
+  <div class="logo-wrap">
+    <a href="index.html" class="logo">⚡<span>Skill</span>Arena</a>
+    <a href="dashboard.html" class="back-btn">← Kembali</a>
+  </div>
+
+  <div class="page-title">💰 Top Up Saldo</div>
+  <div class="page-sub">Saldo dipakai untuk ikut turnamen berbayar. Fee gateway ditanggung platform — tidak ada potongan.</div>
+
+  <div class="saldo-now">
+    <div><div class="sn-label">Saldo sekarang</div><div class="sn-val">Rp 25.000</div></div>
+    <div style="text-align:right"><div class="sn-label">Koin</div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--p)">45 🪙</div></div>
+  </div>
+
+  <span class="quick-label">Pilih Nominal</span>
+  <div class="quick-grid">
+    <button class="quick-btn" onclick="setNominal(10000)">Rp 10K</button>
+    <button class="quick-btn" onclick="setNominal(20000)">Rp 20K</button>
+    <button class="quick-btn active" onclick="setNominal(50000)">Rp 50K</button>
+    <button class="quick-btn" onclick="setNominal(100000)">Rp 100K</button>
+    <button class="quick-btn" onclick="setNominal(200000)">Rp 200K</button>
+    <button class="quick-btn" onclick="setNominal(500000)">Rp 500K</button>
+  </div>
+
+  <div class="field">
+    <label>Atau Masukkan Nominal Sendiri</label>
+    <div class="inp-wrap">
+      <span class="inp-prefix">Rp</span>
+      <input type="number" class="inp" id="nominalInp" value="50000" min="10000" max="500000" step="1000" oninput="updateNominal(this.value)">
+    </div>
+    <div class="inp-note">Min. Rp 10.000 · Maks. Rp 500.000 per transaksi</div>
+  </div>
+
+  <span class="quick-label">Metode Pembayaran</span>
+  <div class="metode-grid">
+    <button class="metode-btn active" onclick="setMetode('gopay',this)"><span class="metode-em">💚</span><span class="metode-name">GoPay</span></button>
+    <button class="metode-btn" onclick="setMetode('ovo',this)"><span class="metode-em">💜</span><span class="metode-name">OVO</span></button>
+    <button class="metode-btn" onclick="setMetode('dana',this)"><span class="metode-em">💙</span><span class="metode-name">Dana</span></button>
+    <button class="metode-btn" onclick="setMetode('qris',this)"><span class="metode-em">📱</span><span class="metode-name">QRIS</span></button>
+  </div>
+
+  <div class="info-box koin" id="koinFeeInfo">
+    🪙 Punya koin? Gunakan <strong>5 koin</strong> untuk bayar fee gateway — gratis! Saldo kamu terpotong 5 koin.
+    <button onclick="pakaiKoin()" style="background:var(--p);border:none;color:#fff;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;margin-top:6px;display:block">Pakai 5 Koin</button>
+  </div>
+
+  <div class="summary" id="summary">
+    <div class="sum-row"><span class="sum-label">Nominal top up</span><span class="sum-val" id="sumNominal">Rp 50.000</span></div>
+    <div class="sum-row"><span class="sum-label">Fee gateway</span><span class="sum-val" id="sumFee">Rp 1.250</span></div>
+    <div class="sum-row"><span class="sum-label">Koin dipakai</span><span class="sum-val" id="sumKoin">—</span></div>
+    <div class="sum-row"><span class="sum-label">Saldo masuk</span><span class="sum-val green" id="sumMasuk">Rp 50.000</span></div>
+    <div class="sum-row"><span class="sum-label">Total bayar</span><span class="sum-val" id="sumTotal">Rp 51.250</span></div>
+  </div>
+
+  <button class="btn btn-primary" id="btnTopup" onclick="prosesTopup()">
+    Bayar via GoPay →
+  </button>
+
+  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6">
+    🔒 Pembayaran diproses oleh Midtrans · Terenkripsi & Aman<br>
+    Saldo masuk otomatis setelah pembayaran berhasil
+  </p>
+</div>
+
+<script>
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(a)})();
+
+let nominal=50000,metode='gopay',pakaiKoinFlag=false;
+const FEE_RATE=0.025;
+
+function setNominal(n){
+  nominal=n;
+  document.getElementById('nominalInp').value=n;
+  document.querySelectorAll('.quick-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateSummary();
+}
+function updateNominal(v){
+  nominal=parseInt(v)||0;
+  document.querySelectorAll('.quick-btn').forEach(b=>b.classList.remove('active'));
+  updateSummary();
+}
+function setMetode(m,btn){
+  metode=m;
+  document.querySelectorAll('.metode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('btnTopup').textContent='Bayar via '+{gopay:'GoPay',ovo:'OVO',dana:'Dana',qris:'QRIS'}[m]+' →';
+  updateSummary();
+}
+function pakaiKoin(){
+  pakaiKoinFlag=true;
+  document.getElementById('koinFeeInfo').innerHTML='✅ <strong>5 koin akan dipakai</strong> untuk menanggung fee gateway.';
+  document.getElementById('koinFeeInfo').style.background='rgba(0,230,118,.08)';
+  document.getElementById('koinFeeInfo').style.borderColor='rgba(0,230,118,.2)';
+  document.getElementById('koinFeeInfo').style.color='var(--g)';
+  updateSummary();
+}
+function updateSummary(){
+  const fee=pakaiKoinFlag?0:Math.round(nominal*FEE_RATE);
+  document.getElementById('sumNominal').textContent='Rp '+nominal.toLocaleString('id');
+  document.getElementById('sumFee').textContent=pakaiKoinFlag?'Rp 0 (ditanggung koin)':'Rp '+fee.toLocaleString('id');
+  document.getElementById('sumKoin').textContent=pakaiKoinFlag?'5 koin':'—';
+  document.getElementById('sumMasuk').textContent='Rp '+nominal.toLocaleString('id');
+  document.getElementById('sumTotal').textContent='Rp '+(nominal+fee).toLocaleString('id');
+}
+function prosesTopup(){
+  if(nominal<10000){alert('Minimal top up Rp 10.000');return}
+  const btn=document.getElementById('btnTopup');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>Memproses...';
+  /* Di production: panggil Netlify Function
+  fetch('/.netlify/functions/payment-callback',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({amount:nominal,method:metode,useKoin:pakaiKoinFlag})
+  }).then(r=>r.json()).then(data=>{
+    if(data.redirect_url)window.location.href=data.redirect_url;
+  }); */
+  setTimeout(()=>{
+    btn.disabled=false;
+    btn.innerHTML='Bayar via '+(metode==='gopay'?'GoPay':metode==='ovo'?'OVO':metode==='dana'?'Dana':'QRIS')+' →';
+    alert('Demo: Di production akan redirect ke halaman pembayaran Midtrans.');
+  },1500);
+}
+updateSummary();
+document.querySelectorAll('button,a,input').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2) translate(-25%,-25%)';curR.style.transform='scale(1.4) translate(-18%,-18%)'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1) translate(-50%,-50%)';curR.style.transform='scale(1) translate(-50%,-50%)'});
+});
+</script>
+</body>
+</html>

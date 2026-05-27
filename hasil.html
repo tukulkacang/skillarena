@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillArena.id — Hasil Turnamen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#FFD600;--o:#FF4D00;--g:#00E676;--p:#A259FF;--r:#FF3366;
+  --dark:#07070F;--dark2:#0F0F1A;--dark3:#171726;--dark4:#1F1F32;
+  --text:#F0F0FF;--muted:#6B6B90;--border:rgba(255,255,255,0.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none}
+@media(max-width:768px){body{cursor:auto}}
+
+.cur{width:10px;height:10px;background:var(--y);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:transform .1s}
+.cur-r{width:34px;height:34px;border:1.5px solid rgba(255,214,0,.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .12s ease}
+@media(max-width:768px){.cur,.cur-r{display:none}}
+
+.mesh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(100px);opacity:.08;animation:floatBlob 12s ease-in-out infinite}
+.b1{width:500px;height:500px;background:var(--p);top:-150px;left:-150px}
+.b2{width:400px;height:400px;background:var(--g);bottom:-100px;right:-100px;animation-delay:-5s}
+@keyframes floatBlob{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;z-index:100;background:rgba(7,7,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:900;color:var(--y);text-decoration:none;letter-spacing:-.5px}
+.logo span{color:var(--text)}
+.nav-r{display:flex;gap:12px}
+.nav-btn{padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;cursor:none;border:none;font-family:'Plus Jakarta Sans',sans-serif}
+@media(max-width:768px){.nav-btn{cursor:auto}}
+.nav-btn.primary{background:var(--y);color:var(--dark)}
+.nav-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted)}
+
+/* MAIN */
+.main{max-width:760px;margin:0 auto;padding:88px 20px 40px;position:relative;z-index:1}
+
+/* BREATHING GAP BANNER */
+.breathing-banner{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;margin-bottom:24px;animation:fadeUp .5s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.breath-timer-wrap{margin:20px auto;width:80px;height:80px;position:relative}
+.breath-svg{transform:rotate(-90deg);width:100%;height:100%}
+.bt-track{fill:none;stroke:var(--dark4);stroke-width:5}
+.bt-fill{fill:none;stroke:var(--y);stroke-width:5;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:0;transition:stroke-dashoffset .5s linear}
+.breath-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Syne',sans-serif;font-size:24px;font-weight:900;color:var(--y)}
+.breath-label{font-size:12px;color:var(--muted);margin-top:8px;letter-spacing:1px;text-transform:uppercase}
+
+/* RESULT HEADER */
+.result-header{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:32px 28px;text-align:center;margin-bottom:20px;position:relative;overflow:hidden;animation:fadeUp .5s ease .1s both}
+.result-header::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)}
+.result-emoji{font-size:56px;display:block;margin-bottom:12px;animation:bounceIn .5s cubic-bezier(.34,1.56,.64,1) .3s both}
+@keyframes bounceIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.result-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;margin-bottom:6px}
+.result-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;max-width:400px;margin-left:auto;margin-right:auto}
+.result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:480px){.result-stats{grid-template-columns:repeat(2,1fr)}}
+.rs{background:var(--dark3);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
+.rs-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:900;display:block;margin-bottom:3px}
+.rs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+
+/* RANK BADGE */
+.rank-badge{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border-radius:100px;font-size:15px;font-weight:700;margin-bottom:20px}
+.rank-badge.menang{background:rgba(255,214,0,.12);border:1px solid rgba(255,214,0,.3);color:var(--y)}
+.rank-badge.kalah{background:rgba(255,51,102,.08);border:1px solid rgba(255,51,102,.2);color:var(--r)}
+.rank-badge.kompensasi{background:rgba(162,89,255,.08);border:1px solid rgba(162,89,255,.2);color:var(--p)}
+
+/* PRIZE INFO */
+.prize-result{background:linear-gradient(135deg,rgba(0,230,118,.06),rgba(255,214,0,.04));border:1px solid rgba(0,230,118,.15);border-radius:16px;padding:18px;margin-bottom:20px;text-align:center}
+.pr-label{font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.pr-amount{font-family:'Syne',sans-serif;font-size:40px;font-weight:900;color:var(--g);line-height:1;margin-bottom:4px}
+.pr-note{font-size:12px;color:var(--muted)}
+
+/* ANALISIS KELEMAHAN */
+.analisis-card{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:20px;animation:fadeUp .5s ease .2s both}
+.sec-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:block;padding-bottom:10px;border-bottom:1px solid var(--border)}
+
+/* SOAL REVIEW */
+.soal-list{display:flex;flex-direction:column;gap:10px}
+.soal-item{padding:14px;border-radius:14px;border:1px solid var(--border)}
+.soal-item.benar{background:rgba(0,230,118,.05);border-color:rgba(0,230,118,.15)}
+.soal-item.salah{background:rgba(255,51,102,.05);border-color:rgba(255,51,102,.15)}
+.soal-item.timeout{background:rgba(255,77,0,.05);border-color:rgba(255,77,0,.15)}
+.soal-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.soal-status{font-size:14px;flex-shrink:0}
+.soal-num{font-size:11px;font-weight:600;color:var(--muted)}
+.soal-text{font-size:13px;font-weight:500;line-height:1.5;margin-bottom:8px}
+.soal-answers{display:flex;flex-direction:column;gap:4px}
+.ans-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.ans-label{font-weight:500;min-width:70px;flex-shrink:0}
+.ans-val{color:var(--muted)}
+.ans-val.correct{color:var(--g);font-weight:600}
+.ans-val.wrong{color:var(--r);text-decoration:line-through}
+.soal-explain{margin-top:8px;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:8px;font-size:12px;color:var(--muted);line-height:1.6}
+.soal-explain strong{color:var(--text)}
+.report-soal{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0;margin-top:6px;transition:color .2s}
+.report-soal:hover{color:var(--o)}
+
+/* LATIHAN REKOMENDASI */
+.latihan-card{background:linear-gradient(135deg,rgba(162,89,255,.08),rgba(0,230,118,.05));border:1px solid rgba(162,89,255,.15);border-radius:16px;padding:20px;margin-bottom:20px;animation:fadeUp .5s ease .3s both}
+.latihan-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px}
+.latihan-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
+.latihan-topics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.topic-chip{padding:6px 14px;background:rgba(162,89,255,.1);border:1px solid rgba(162,89,255,.2);border-radius:100px;font-size:12px;font-weight:500;color:var(--p)}
+.btn-latihan{padding:12px 24px;background:var(--p);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:none;transition:transform .15s,box-shadow .15s;text-decoration:none;display:inline-block}
+@media(max-width:768px){.btn-latihan{cursor:auto}}
+.btn-latihan:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(162,89,255,.3)}
+
+/* LEADERBOARD FINAL */
+.lb-final{display:flex;flex-direction:column;gap:8px}
+.lbf-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--dark3);border:1px solid var(--border);border-radius:14px}
+.lbf-item.me{background:rgba(255,214,0,.06);border-color:rgba(255,214,0,.2)}
+.lbf-rank{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;min-width:36px;text-align:center}
+.lbf-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.lbf-info{flex:1}
+.lbf-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.lbf-score{font-size:12px;color:var(--muted)}
+.lbf-prize{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;text-align:right}
+
+/* SHARE CARD */
+.share-card{background:linear-gradient(135deg,rgba(255,214,0,.08),rgba(255,77,0,.05));border:1px solid rgba(255,214,0,.15);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center;animation:fadeUp .5s ease .4s both}
+.share-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.share-preview{background:var(--dark);border-radius:14px;padding:20px;margin-bottom:16px;border:1px solid var(--border)}
+.share-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:900;color:var(--y);margin-bottom:8px}
+.share-result-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;margin-bottom:4px}
+.share-detail{font-size:12px;color:var(--muted)}
+.share-btns{display:flex;gap:10px;justify-content:center}
+.share-btn{padding:10px 20px;border-radius:12px;font-size:13px;font-weight:600;cursor:none;transition:all .15s;border:none;font-family:'Plus Jakarta Sans',sans-serif}
+@media(max-width:768px){.share-btn{cursor:auto}}
+.share-btn.wa{background:#25D366;color:#fff}
+.share-btn.copy{background:var(--dark3);border:1px solid var(--border);color:var(--muted)}
+.share-btn.copy:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+
+/* ACTION BTNS */
+.action-wrap{display:flex;gap:12px;margin-bottom:20px;animation:fadeUp .5s ease .5s both}
+@media(max-width:480px){.action-wrap{flex-direction:column}}
+.btn-main-action{flex:1;padding:14px;background:var(--y);color:var(--dark);border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:none;transition:transform .15s,box-shadow .15s;text-decoration:none;text-align:center}
+@media(max-width:768px){.btn-main-action{cursor:auto}}
+.btn-main-action:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(255,214,0,.3)}
+.btn-sec-action{flex:1;padding:14px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:14px;font-size:14px;cursor:none;transition:all .15s;text-decoration:none;text-align:center}
+@media(max-width:768px){.btn-sec-action{cursor:auto}}
+.btn-sec-action:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+
+/* DISCLAIMER */
+.disclaimer{font-size:11px;color:var(--muted);text-align:center;line-height:1.6;padding:14px;background:var(--dark2);border-radius:12px;border:1px solid var(--border)}
+
+/* CONFETTI */
+.cf{position:fixed;border-radius:2px;animation:cfFall linear forwards;pointer-events:none;z-index:999}
+@keyframes cfFall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-r" id="curR"></div>
+<div class="mesh"><div class="blob b1"></div><div class="blob b2"></div></div>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">⚡<span>Skill</span>Arena<span>.id</span></a>
+  <div class="nav-r">
+    <a href="turnamen.html" class="nav-btn primary">⚡ Turnamen Lagi</a>
+    <a href="dashboard.html" class="nav-btn secondary">📊 Dashboard</a>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- BREATHING GAP -->
+  <div class="breathing-banner" id="breathingBanner">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">Istirahat Sebentar</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px">Lihat hasil & pelajari soal yang salah</div>
+    <div class="breath-timer-wrap">
+      <svg class="breath-svg" viewBox="0 0 80 80">
+        <circle class="bt-track" cx="40" cy="40" r="35"/>
+        <circle class="bt-fill" id="btFill" cx="40" cy="40" r="35"/>
+      </svg>
+      <div class="breath-num" id="breathNum">12</div>
+    </div>
+    <div class="breath-label">detik sebelum bisa ikut lagi</div>
+  </div>
+
+  <!-- RESULT HEADER -->
+  <div class="result-header">
+    <span class="result-emoji" id="rEmoji">🏆</span>
+    <div class="result-title" id="rTitle">Luar Biasa!</div>
+    <div class="result-sub" id="rSub">Kamu menjawab dengan sangat baik hari ini!</div>
+
+    <div class="result-stats">
+      <div class="rs"><span class="rs-val" style="color:var(--y)" id="rScore">1.247</span><span class="rs-lbl">Skor</span></div>
+      <div class="rs"><span class="rs-val" style="color:var(--g)" id="rCorrect">9/10</span><span class="rs-lbl">Benar</span></div>
+      <div class="rs"><span class="rs-val" style="color:var(--p)" id="rRank">#1</span><span class="rs-lbl">Ranking</span></div>
+      <div class="rs"><span class="rs-val" style="color:var(--o)" id="rStreak">5🔥</span><span class="rs-lbl">Streak Max</span></div>
+    </div>
+
+    <div class="rank-badge menang" id="rankBadge">
+      🥇 Juara 1 dari 104 peserta
+    </div>
+
+    <div class="prize-result" id="prizeResult">
+      <div class="pr-label">Hadiah Kamu</div>
+      <div class="pr-amount" id="prAmount">Rp 52.000</div>
+      <div class="pr-note">Akan cair ke GoPay/OVO/Dana dalam 24 jam · Full 100% tanpa potongan</div>
+    </div>
+  </div>
+
+  <!-- ACTION BUTTONS -->
+  <div class="action-wrap">
+    <a href="turnamen.html" class="btn-main-action" id="btnIkutLagi">⚡ Ikut Turnamen Lagi</a>
+    <a href="belajar.html" class="btn-sec-action">📚 Latihan Gratis</a>
+  </div>
+
+  <!-- ANALISIS KELEMAHAN -->
+  <div class="analisis-card">
+    <span class="sec-label">📋 Review Soal — Analisis Kelemahan</span>
+    <div class="soal-list" id="soalList">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+
+  <!-- REKOMENDASI LATIHAN -->
+  <div class="latihan-card" id="latihanCard">
+    <div class="latihan-title">📚 Rekomendasi Latihan</div>
+    <div class="latihan-sub" id="latihanSub">Berdasarkan soal yang kamu salah, fokus latihan di topik berikut:</div>
+    <div class="latihan-topics" id="latihanTopics"></div>
+    <a href="belajar.html" class="btn-latihan">Mulai Latihan Gratis →</a>
+  </div>
+
+  <!-- LEADERBOARD FINAL -->
+  <div class="analisis-card">
+    <span class="sec-label">🏆 Leaderboard Final</span>
+    <div class="lb-final" id="lbFinal"></div>
+  </div>
+
+  <!-- SHARE -->
+  <div class="share-card">
+    <div class="share-title">🎉 Bagikan hasilmu!</div>
+    <div class="share-preview">
+      <div class="share-logo">⚡ SkillArena.id</div>
+      <div class="share-result-text" id="shareText">Aku baru menang Rp 52.000 dari kuis Sejarah Indonesia! 🏆</div>
+      <div class="share-detail" id="shareDetail">Skor: 1.247 · Rank #1 dari 104 peserta · Win Rate: 68%</div>
+    </div>
+    <div class="share-btns">
+      <button class="share-btn wa" onclick="shareWA()">📱 Share ke WhatsApp</button>
+      <button class="share-btn copy" onclick="copyLink()">📋 Salin Link</button>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    Soal diacak dari bank soal. Tidak ada jaminan menang meski skill tinggi.<br>
+    Hadiah maks Rp 500.000 per turnamen. WD full 100% tanpa potongan apapun.
+  </div>
+
+</div><!-- end main -->
+
+<script>
+/* CURSOR */
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('button,a').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2) translate(-25%,-25%)';curR.style.transform='scale(1.4) translate(-18%,-18%)'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1) translate(-50%,-50%)';curR.style.transform='scale(1) translate(-50%,-50%)'});
+});
+
+/* DATA HASIL (demo — di production dari URL params / session) */
+const HASIL={
+  kategori:'🇮🇩 Sejarah Indonesia',
+  tipe:'Turnamen Besar',
+  skor:1247,
+  benar:9,
+  total:10,
+  rank:1,
+  totalPeserta:104,
+  streakMax:5,
+  hadiah:52000,
+  menang:true,
+  winsToday:3,
+  maxWins:5,
+  soalReview:[
+    {num:1,q:'Pada tanggal berapa Indonesia memproklamasikan kemerdekaannya?',status:'benar',jawabanKamu:'17 Agustus 1945',jawabanBenar:'17 Agustus 1945',penjelasan:'Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945 di Jalan Pegangsaan Timur 56, Jakarta.',waktu:4.2},
+    {num:2,q:'Siapakah yang membacakan teks Proklamasi?',status:'benar',jawabanKamu:'Sukarno & Hatta',jawabanBenar:'Sukarno & Hatta',penjelasan:'Sukarno membacakan teks, didampingi Mohammad Hatta sebagai wakil bangsa Indonesia.',waktu:3.8},
+    {num:3,q:'Apa nama kerajaan Hindu-Buddha terbesar di Nusantara?',status:'salah',jawabanKamu:'Sriwijaya',jawabanBenar:'Majapahit',penjelasan:'Majapahit (1293-1527) adalah kerajaan terbesar di Nusantara, dengan wilayah mencakup sebagian besar Asia Tenggara.',waktu:8.1},
+    {num:4,q:'Siapakah pendiri Budi Utomo?',status:'benar',jawabanKamu:'Soetomo',jawabanBenar:'Soetomo',penjelasan:'Dr. Soetomo mendirikan Budi Utomo pada 20 Mei 1908 bersama mahasiswa STOVIA.',waktu:5.6},
+    {num:5,q:'Candi Borobudur dibangun pada masa dinasti?',status:'benar',jawabanKamu:'Dinasti Syailendra',jawabanBenar:'Dinasti Syailendra',penjelasan:'Borobudur dibangun pada abad ke-8 oleh Dinasti Syailendra dari Kerajaan Mataram Kuno.',waktu:6.2},
+    {num:6,q:'Isi penting Sumpah Pemuda 1928?',status:'benar',jawabanKamu:'Satu nusa, satu bangsa, satu bahasa',jawabanBenar:'Satu nusa, satu bangsa, satu bahasa',penjelasan:'Sumpah Pemuda 28 Oktober 1928 menyatakan tekad bertanah air, berbangsa, dan berbahasa satu: Indonesia.',waktu:3.1},
+    {num:7,q:'Pahlawan perempuan Aceh yang berjuang melawan Belanda?',status:'benar',jawabanKamu:'Cut Nyak Dhien',jawabanBenar:'Cut Nyak Dhien',penjelasan:'Cut Nyak Dhien adalah pahlawan nasional dari Aceh yang terus berjuang meski suaminya gugur.',waktu:4.5},
+    {num:8,q:'Perang Diponegoro berlangsung dari tahun?',status:'benar',jawabanKamu:'1825–1830',jawabanBenar:'1825–1830',penjelasan:'Perang Diponegoro berlangsung 5 tahun (1825-1830) dan merupakan salah satu perang terbesar di Jawa.',waktu:5.2},
+    {num:9,q:'Presiden pertama Republik Indonesia?',status:'benar',jawabanKamu:'Ir. Soekarno',jawabanBenar:'Ir. Soekarno',penjelasan:'Ir. Soekarno adalah presiden pertama RI, menjabat dari 1945 hingga 1967.',waktu:2.9},
+    {num:10,q:'Perjanjian yang mengakhiri Perang Diponegoro?',status:'timeout',jawabanKamu:'(Timeout)',jawabanBenar:'Tidak ada perjanjian formal',penjelasan:'Perang Diponegoro berakhir karena Diponegoro ditangkap melalui tipu muslihat perundingan oleh Belanda di Magelang, bukan perjanjian formal.',waktu:15},
+  ]
+};
+
+/* BREATHING GAP */
+let breathSec=12;
+const btCirc=2*Math.PI*35;
+const btFill=document.getElementById('btFill');
+function updateBreath(){
+  document.getElementById('breathNum').textContent=breathSec;
+  const pct=breathSec/12;
+  btFill.style.strokeDashoffset=btCirc*(1-pct);
+}
+updateBreath();
+const breathInterval=setInterval(()=>{
+  breathSec--;updateBreath();
+  if(breathSec<=0){
+    clearInterval(breathInterval);
+    document.getElementById('breathingBanner').style.opacity='.4';
+    document.getElementById('btnIkutLagi').style.opacity='1';
+  }
+},1000);
+
+// Disable tombol ikut lagi selama breathing
+document.getElementById('btnIkutLagi').style.opacity='.4';
+document.getElementById('btnIkutLagi').style.pointerEvents='none';
+setTimeout(()=>{
+  document.getElementById('btnIkutLagi').style.opacity='1';
+  document.getElementById('btnIkutLagi').style.pointerEvents='auto';
+},12000);
+
+/* RENDER RESULT */
+function renderResult(){
+  const h=HASIL;
+  const pct=h.benar/h.total;
+  if(pct>=0.9){
+    document.getElementById('rEmoji').textContent='🏆';
+    document.getElementById('rTitle').textContent='Luar Biasa!';
+    document.getElementById('rTitle').style.color='var(--y)';
+    document.getElementById('rSub').textContent='Kamu jawab '+h.benar+' dari '+h.total+' soal dengan benar. Performa terbaik!';
+    launchConfetti();
+  }else if(pct>=0.6){
+    document.getElementById('rEmoji').textContent='🎯';
+    document.getElementById('rTitle').textContent='Bagus!';
+    document.getElementById('rTitle').style.color='var(--g)';
+    document.getElementById('rSub').textContent='Solid! '+h.benar+'/'+h.total+' benar. Sedikit lagi sempurna.';
+  }else{
+    document.getElementById('rEmoji').textContent='💪';
+    document.getElementById('rTitle').textContent='Ayo Berlatih!';
+    document.getElementById('rTitle').style.color='var(--p)';
+    document.getElementById('rSub').textContent='Jangan menyerah! '+h.benar+'/'+h.total+' benar. Latihan dulu yuk!';
+  }
+  document.getElementById('rScore').textContent=h.skor.toLocaleString('id');
+  document.getElementById('rCorrect').textContent=h.benar+'/'+h.total;
+  document.getElementById('rRank').textContent='#'+h.rank;
+  document.getElementById('rStreak').textContent=h.streakMax+'🔥';
+
+  // Rank badge
+  const badge=document.getElementById('rankBadge');
+  if(h.rank===1){badge.className='rank-badge menang';badge.textContent='🥇 Juara 1 dari '+h.totalPeserta+' peserta'}
+  else if(h.rank<=Math.ceil(h.totalPeserta*.2)){badge.className='rank-badge menang';badge.textContent='🎖️ Top 20% — Peringkat #'+h.rank+' dari '+h.totalPeserta}
+  else{badge.className='rank-badge kalah';badge.textContent='Peringkat #'+h.rank+' dari '+h.totalPeserta+' peserta'}
+
+  // Prize
+  if(h.menang&&h.hadiah>0){
+    if(h.winsToday>=h.maxWins){
+      document.getElementById('prAmount').textContent='Hadiah Digeser';
+      document.getElementById('prAmount').style.color='var(--p)';
+      document.getElementById('prizeResult').style.background='rgba(162,89,255,.06)';
+      document.getElementById('prizeResult').style.borderColor='rgba(162,89,255,.15)';
+      document.getElementById('prAmount').insertAdjacentHTML('afterend','<div style="font-size:12px;color:var(--muted);margin-top:4px">Kamu sudah menang '+h.maxWins+'x hari ini. Hadiah dialihkan ke peringkat berikutnya. Skor & XP tetap dihitung!</div>');
+    }else{
+      document.getElementById('prAmount').textContent='Rp '+h.hadiah.toLocaleString('id');
+    }
+  }else{
+    document.getElementById('prizeResult').style.background='rgba(107,107,144,.06)';
+    document.getElementById('prizeResult').style.borderColor='var(--border)';
+    document.getElementById('prAmount').textContent='XP + Koin';
+    document.getElementById('prAmount').style.color='var(--muted)';
+  }
+}
+
+/* RENDER SOAL REVIEW */
+function renderSoalReview(){
+  const list=document.getElementById('soalList');
+  list.innerHTML=HASIL.soalReview.map(s=>`
+    <div class="soal-item ${s.status}">
+      <div class="soal-header">
+        <span class="soal-status">${s.status==='benar'?'✅':s.status==='timeout'?'⏱️':'❌'}</span>
+        <span class="soal-num">Soal ${s.num} · ${s.waktu}s</span>
+      </div>
+      <div class="soal-text">${s.q}</div>
+      <div class="soal-answers">
+        ${s.status!=='benar'?`<div class="ans-row"><span class="ans-label">Jawabanmu:</span><span class="ans-val wrong">${s.jawabanKamu}</span></div>`:''}
+        <div class="ans-row"><span class="ans-label">Jawaban benar:</span><span class="ans-val correct">${s.jawabanBenar}</span></div>
+      </div>
+      ${s.status!=='benar'?`<div class="soal-explain"><strong>Penjelasan:</strong> ${s.penjelasan}</div>`:''}
+      <button class="report-soal" onclick="reportSoal(${s.num})">⚑ Laporkan soal ini</button>
+    </div>
+  `).join('');
+}
+
+/* RENDER LATIHAN REKOMENDASI */
+function renderLatihan(){
+  const salah=HASIL.soalReview.filter(s=>s.status!=='benar');
+  if(salah.length===0){
+    document.getElementById('latihanCard').style.display='none';return;
+  }
+  document.getElementById('latihanSub').textContent='Kamu salah '+salah.length+' soal. Latihan gratis di topik ini untuk meningkatkan skor:';
+  const topics=['Kerajaan Nusantara','Akhir Perang Diponegoro'];
+  document.getElementById('latihanTopics').innerHTML=topics.map(t=>`<span class="topic-chip">${t}</span>`).join('');
+}
+
+/* RENDER LEADERBOARD FINAL */
+function renderLBFinal(){
+  const players=[
+    {name:'Kamu',score:1247,rank:1,color:'var(--p)',me:true,prize:'Rp 52.000'},
+    {name:'Rina S.',score:1198,rank:2,color:'var(--o)',prize:'Rp 34.600'},
+    {name:'Agus P.',score:1142,rank:3,color:'var(--g)',prize:'Rp 17.300'},
+    {name:'Dewi K.',score:987,rank:4,color:'var(--y)',prize:'Rp 4.937'},
+    {name:'Fajar M.',score:921,rank:5,color:'#60A5FA',prize:'Rp 4.937'},
+  ];
+  document.getElementById('lbFinal').innerHTML=players.map(p=>`
+    <div class="lbf-item ${p.me?'me':''}">
+      <div class="lbf-rank">${p.rank===1?'🥇':p.rank===2?'🥈':p.rank===3?'🥉':p.rank}</div>
+      <div class="lbf-av" style="background:${p.color}22;color:${p.color};width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${p.name[0]}</div>
+      <div class="lbf-info">
+        <div class="lbf-name">${p.me?'<strong>'+p.name+'</strong>':p.name}</div>
+        <div class="lbf-score">${p.score.toLocaleString('id')} poin</div>
+      </div>
+      <div class="lbf-prize" style="color:${p.rank<=Math.ceil(104*.2)?'var(--g)':'var(--muted)'}">${p.prize}</div>
+    </div>
+  `).join('');
+}
+
+/* SHARE */
+function shareWA(){
+  const h=HASIL;
+  const text=`Aku baru ${h.menang?'menang Rp '+h.hadiah.toLocaleString('id'):'ikut turnamen'} dari kuis ${h.kategori} di SkillArena.id! 🏆\nSkor: ${h.skor.toLocaleString('id')} · Rank #${h.rank} dari ${h.totalPeserta} peserta\nCoba juga → skillarena.netlify.app`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+function copyLink(){
+  navigator.clipboard.writeText('https://skillarena.netlify.app').then(()=>{
+    const btn=document.querySelector('.share-btn.copy');
+    btn.textContent='✅ Tersalin!';
+    setTimeout(()=>btn.textContent='📋 Salin Link',2000);
+  });
+}
+
+/* REPORT */
+function reportSoal(num){
+  const btns=document.querySelectorAll('.report-soal');
+  btns[num-1].textContent='✓ Dilaporkan';
+  btns[num-1].style.color='var(--g)';
+  btns[num-1].disabled=true;
+}
+
+/* CONFETTI */
+function launchConfetti(){
+  const colors=['#FFD600','#FF4D00','#00E676','#A259FF','#FF3366'];
+  for(let i=0;i<50;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.className='cf';
+      el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()*2}s;width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'}`;
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(),3500);
+    },i*40);
+  }
+}
+
+/* INIT */
+renderResult();
+renderSoalReview();
+renderLatihan();
+renderLBFinal();
+</script>
+</body>
+</html>
