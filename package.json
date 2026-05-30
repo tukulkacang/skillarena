@@ -1,0 +1,9 @@
+{
+  "name": "skillarena",
+  "version": "1.0.0",
+  "description": "SkillArena.id — Competitive Learning Platform",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "node-fetch": "^2.7.0"
+  }
+}
