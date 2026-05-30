@@ -1,3 +1,9 @@
+[build]
+  functions = "netlify/functions"
+
+[build.environment]
+  SECRETS_SCAN_ENABLED = "false"
+
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["@supabase/supabase-js"]
